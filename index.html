@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LLM Prompt Engineering Playground</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Header -->
+        <header class="app-header">
+            <div class="header-content">
+                <h1>🧪 LLM Eval Playground</h1>
+                <p class="tagline">Compare model outputs side-by-side</p>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Configuration Panel -->
+            <section class="config-panel">
+                <div class="config-grid">
+                    <!-- Model Selection -->
+                    <div class="config-card">
+                        <h3>
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M12 2L2 7l10 5 10-5-10-5z"/>
+                                <path d="M2 17l10 5 10-5"/>
+                                <path d="M2 12l10 5 10-5"/>
+                            </svg>
+                            Select Models
+                        </h3>
+                        <p class="hint">Choose one or more models to compare</p>
+                        <div class="model-checkboxes" id="modelCheckboxes">
+                            <!-- Populated by JavaScript -->
+                        </div>
+                    </div>
+
+                    <!-- Document Upload -->
+                    <div class="config-card">
+                        <h3>
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                                <polyline points="14 2 14 8 20 8"/>
+                            </svg>
+                            Upload Document
+                        </h3>
+                        <p class="hint">PDF document to parse</p>
+                        <div class="upload-zone" id="uploadZone">
+                            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                                <polyline points="17 8 12 3 7 8"/>
+                                <line x1="12" y1="3" x2="12" y2="15"/>
+                            </svg>
+                            <span>Click or drag PDF here</span>
+                            <input type="file" id="fileInput" accept=".pdf" hidden>
+                        </div>
+                        <div class="file-badge" id="fileBadge" style="display: none;">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                                <polyline points="14 2 14 8 20 8"/>
+                            </svg>
+                            <span id="fileName">document.pdf</span>
+                            <button class="remove-file" id="removeFile">×</button>
+                        </div>
+                    </div>
+
+                    <!-- Target Schema -->
+                    <div class="config-card schema-card">
+                        <h3>
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polyline points="16 18 22 12 16 6"/>
+                                <polyline points="8 6 2 12 8 18"/>
+                            </svg>
+                            Target JSON Schema
+                        </h3>
+                        <p class="hint">Paste the JSON schema structure you want to extract</p>
+                        <div class="schema-input-wrapper">
+                            <textarea 
+                                id="schemaInput" 
+                                class="schema-input" 
+                                placeholder='{"field1": "", "field2": [], "nested": {"key": ""}}'
+                                spellcheck="false"
+                            ></textarea>
+                            <div class="schema-actions">
+                                <button class="schema-btn" id="formatSchema" title="Format JSON">
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <line x1="21" y1="10" x2="3" y2="10"/>
+                                        <line x1="21" y1="6" x2="3" y2="6"/>
+                                        <line x1="21" y1="14" x2="3" y2="14"/>
+                                        <line x1="21" y1="18" x2="3" y2="18"/>
+                                    </svg>
+                                </button>
+                                <button class="schema-btn" id="clearSchema" title="Clear">
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <line x1="18" y1="6" x2="6" y2="18"/>
+                                        <line x1="6" y1="6" x2="18" y2="18"/>
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="schema-status" id="schemaStatus"></div>
+                    </div>
+                </div>
+
+                <!-- Run Button -->
+                <div class="run-section">
+                    <button class="run-btn" id="runBtn" disabled>
+                        <span class="btn-content">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polygon points="5 3 19 12 5 21 5 3"/>
+                            </svg>
+                            Run Evaluation
+                        </span>
+                        <span class="btn-spinner" style="display: none;"></span>
+                    </button>
+                </div>
+            </section>
+
+            <!-- Results Section -->
+            <section class="results-section" id="resultsSection" style="display: none;">
+                <div class="results-header">
+                    <h2>📊 Results Comparison</h2>
+                    <button class="clear-results-btn" id="clearResults">Clear Results</button>
+                </div>
+                <div class="results-grid" id="resultsGrid">
+                    <!-- Results cards populated by JavaScript -->
+                </div>
+            </section>
+
+            <!-- Error Message -->
+            <div class="error-toast" id="errorToast" style="display: none;">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"/>
+                    <line x1="15" y1="9" x2="9" y2="15"/>
+                    <line x1="9" y1="9" x2="15" y2="15"/>
+                </svg>
+                <span id="errorMessage"></span>
+            </div>
+        </main>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
