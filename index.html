@@ -3,145 +3,627 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LLM Prompt Engineering Playground</title>
-    <link rel="stylesheet" href="styles.css">
+    <title>LLM Eval Playground</title>
+    <link rel="stylesheet" href="styles.css?v=2">
     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
     <div class="app-container">
-        <!-- Header -->
-        <header class="app-header">
-            <div class="header-content">
-                <h1>🧪 LLM Eval Playground</h1>
-                <p class="tagline">Compare model outputs side-by-side</p>
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <h1 class="logo">🧪 Eval Lab</h1>
             </div>
-        </header>
-
-        <!-- Main Content -->
-        <main class="main-content">
-            <!-- Configuration Panel -->
-            <section class="config-panel">
-                <div class="config-grid">
-                    <!-- Model Selection -->
-                    <div class="config-card">
-                        <h3>
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M12 2L2 7l10 5 10-5-10-5z"/>
-                                <path d="M2 17l10 5 10-5"/>
-                                <path d="M2 12l10 5 10-5"/>
-                            </svg>
-                            Select Models
-                        </h3>
-                        <p class="hint">Choose one or more models to compare</p>
-                        <div class="model-checkboxes" id="modelCheckboxes">
-                            <!-- Populated by JavaScript -->
-                        </div>
-                    </div>
-
-                    <!-- Document Upload -->
-                    <div class="config-card">
-                        <h3>
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-                                <polyline points="14 2 14 8 20 8"/>
-                            </svg>
-                            Upload Document
-                        </h3>
-                        <p class="hint">PDF document to parse</p>
-                        <div class="upload-zone" id="uploadZone">
-                            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-                                <polyline points="17 8 12 3 7 8"/>
-                                <line x1="12" y1="3" x2="12" y2="15"/>
-                            </svg>
-                            <span>Click or drag PDF here</span>
-                            <input type="file" id="fileInput" accept=".pdf" hidden>
-                        </div>
-                        <div class="file-badge" id="fileBadge" style="display: none;">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-                                <polyline points="14 2 14 8 20 8"/>
-                            </svg>
-                            <span id="fileName">document.pdf</span>
-                            <button class="remove-file" id="removeFile">×</button>
-                        </div>
-                    </div>
-
-                    <!-- Target Schema -->
-                    <div class="config-card schema-card">
-                        <h3>
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <polyline points="16 18 22 12 16 6"/>
-                                <polyline points="8 6 2 12 8 18"/>
-                            </svg>
-                            Target JSON Schema
-                        </h3>
-                        <p class="hint">Paste the JSON schema structure you want to extract</p>
-                        <div class="schema-input-wrapper">
-                            <textarea 
-                                id="schemaInput" 
-                                class="schema-input" 
-                                placeholder='{"field1": "", "field2": [], "nested": {"key": ""}}'
-                                spellcheck="false"
-                            ></textarea>
-                            <div class="schema-actions">
-                                <button class="schema-btn" id="formatSchema" title="Format JSON">
-                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                        <line x1="21" y1="10" x2="3" y2="10"/>
-                                        <line x1="21" y1="6" x2="3" y2="6"/>
-                                        <line x1="21" y1="14" x2="3" y2="14"/>
-                                        <line x1="21" y1="18" x2="3" y2="18"/>
-                                    </svg>
-                                </button>
-                                <button class="schema-btn" id="clearSchema" title="Clear">
-                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                        <line x1="18" y1="6" x2="6" y2="18"/>
-                                        <line x1="6" y1="6" x2="18" y2="18"/>
-                                    </svg>
-                                </button>
-                            </div>
-                        </div>
-                        <div class="schema-status" id="schemaStatus"></div>
-                    </div>
+            <nav class="sidebar-nav">
+                <button class="nav-item active" data-view="dashboard">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="3" y="3" width="7" height="7"/>
+                        <rect x="14" y="3" width="7" height="7"/>
+                        <rect x="14" y="14" width="7" height="7"/>
+                        <rect x="3" y="14" width="7" height="7"/>
+                    </svg>
+                    Dashboard
+                </button>
+                <button class="nav-item" data-view="eval">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polygon points="5 3 19 12 5 21 5 3"/>
+                    </svg>
+                    New Evaluation
+                </button>
+                <button class="nav-item" data-view="history">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"/>
+                        <polyline points="12 6 12 12 16 14"/>
+                    </svg>
+                    Run History
+                </button>
+                <button class="nav-item" data-view="prompts">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                        <polyline points="14 2 14 8 20 8"/>
+                        <line x1="16" y1="13" x2="8" y2="13"/>
+                        <line x1="16" y1="17" x2="8" y2="17"/>
+                    </svg>
+                    Prompts
+                </button>
+                <button class="nav-item" data-view="schemas">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="3" y="3" width="7" height="7"/>
+                        <rect x="14" y="3" width="7" height="7"/>
+                        <rect x="14" y="14" width="7" height="7"/>
+                        <rect x="3" y="14" width="7" height="7"/>
+                    </svg>
+                    Schemas
+                </button>
+                <button class="nav-item" data-view="judges">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"/>
+                        <path d="M9 12l2 2 4-4"/>
+                    </svg>
+                    Judges
+                </button>
+            </nav>
+            <div class="sidebar-footer">
+                <div class="user-info" id="userInfo">
+                    <span class="user-badge">Demo Mode</span>
                 </div>
+            </div>
+        </aside>
 
-                <!-- Run Button -->
-                <div class="run-section">
-                    <button class="run-btn" id="runBtn" disabled>
-                        <span class="btn-content">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <!-- Main Content Area -->
+        <main class="main-content">
+            <!-- Dashboard View -->
+            <div class="view active" id="dashboardView">
+                <header class="view-header">
+                    <h2>Dashboard</h2>
+                    <p class="subtitle">Overview of your prompt engineering workspace</p>
+                </header>
+                
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                 <polygon points="5 3 19 12 5 21 5 3"/>
                             </svg>
-                            Run Evaluation
-                        </span>
-                        <span class="btn-spinner" style="display: none;"></span>
+                        </div>
+                        <div class="stat-content">
+                            <span class="stat-value" id="totalRuns">0</span>
+                            <span class="stat-label">Total Runs</span>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                                <polyline points="14 2 14 8 20 8"/>
+                            </svg>
+                        </div>
+                        <div class="stat-content">
+                            <span class="stat-value" id="totalPrompts">0</span>
+                            <span class="stat-label">Prompt Versions</span>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"/>
+                                <path d="M9 12l2 2 4-4"/>
+                            </svg>
+                        </div>
+                        <div class="stat-content">
+                            <span class="stat-value" id="totalJudges">0</span>
+                            <span class="stat-label">Judge Templates</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="dashboard-grid">
+                    <section class="dashboard-section">
+                        <div class="section-header">
+                            <h3>Recent Runs</h3>
+                            <button class="btn-text" onclick="showView('history')">View All</button>
+                        </div>
+                        <div class="recent-runs-list" id="recentRunsList">
+                            <div class="empty-state">No runs yet. Start a new evaluation!</div>
+                        </div>
+                    </section>
+                    
+                    <section class="dashboard-section">
+                        <div class="section-header">
+                            <h3>Quick Actions</h3>
+                        </div>
+                        <div class="quick-actions">
+                            <button class="action-card" onclick="showView('eval')">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <polygon points="5 3 19 12 5 21 5 3"/>
+                                </svg>
+                                <span>New Evaluation</span>
+                            </button>
+                            <button class="action-card" onclick="showView('prompts')">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <line x1="12" y1="5" x2="12" y2="19"/>
+                                    <line x1="5" y1="12" x2="19" y2="12"/>
+                                </svg>
+                                <span>New Prompt</span>
+                            </button>
+                            <button class="action-card" onclick="showView('judges')">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"/>
+                                    <line x1="12" y1="8" x2="12" y2="16"/>
+                                    <line x1="8" y1="12" x2="16" y2="12"/>
+                                </svg>
+                                <span>New Judge</span>
+                            </button>
+                        </div>
+                    </section>
+                </div>
+            </div>
+
+            <!-- Evaluation View -->
+            <div class="view" id="evalView">
+                <header class="view-header">
+                    <h2>New Evaluation</h2>
+                    <p class="subtitle">Compare model outputs side-by-side</p>
+                </header>
+                
+                <div class="eval-config">
+                    <div class="config-grid">
+                        <!-- Prompt Selection -->
+                        <div class="config-card">
+                            <h3>
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                                    <polyline points="14 2 14 8 20 8"/>
+                                </svg>
+                                System Prompt
+                            </h3>
+                            <p class="hint">Select a prompt version or use default</p>
+                            <select id="promptSelect" class="select-input">
+                                <option value="">Use Default (from file)</option>
+                            </select>
+                            <button class="btn-text" onclick="showView('prompts')">+ Create New</button>
+                        </div>
+                        
+                        <!-- Model Selection -->
+                        <div class="config-card">
+                            <h3>
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M12 2L2 7l10 5 10-5-10-5z"/>
+                                    <path d="M2 17l10 5 10-5"/>
+                                    <path d="M2 12l10 5 10-5"/>
+                                </svg>
+                                Select Models
+                            </h3>
+                            <p class="hint">Choose one or more models to compare</p>
+                            <div class="model-checkboxes" id="modelCheckboxes">
+                                <!-- Populated by JavaScript -->
+                            </div>
+                        </div>
+
+                        <!-- Document Upload -->
+                        <div class="config-card">
+                            <h3>
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                                    <polyline points="14 2 14 8 20 8"/>
+                                </svg>
+                                Upload Document
+                            </h3>
+                            <p class="hint">PDF document to parse</p>
+                            <div class="upload-zone" id="uploadZone">
+                                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                                    <polyline points="17 8 12 3 7 8"/>
+                                    <line x1="12" y1="3" x2="12" y2="15"/>
+                                </svg>
+                                <span>Click or drag PDF here</span>
+                    <input type="file" id="fileInput" accept=".pdf" hidden>
+                            </div>
+                            <div class="file-badge" id="fileBadge" style="display: none;">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                                    <polyline points="14 2 14 8 20 8"/>
+                                </svg>
+                                <span id="fileName">document.pdf</span>
+                                <button class="remove-file" id="removeFile">×</button>
+                            </div>
+                        </div>
+
+                        <!-- Target Schema -->
+                        <div class="config-card schema-card">
+                            <h3>
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <polyline points="16 18 22 12 16 6"/>
+                                    <polyline points="8 6 2 12 8 18"/>
+                                </svg>
+                                Target JSON Schema
+                            </h3>
+                            <p class="hint">Select a saved schema or paste JSON below</p>
+                            <div class="schema-select-row">
+                                <select id="schemaSelect" class="select-input">
+                                    <option value="">Select saved schema...</option>
+                                </select>
+                                <button class="btn-text" id="saveSchemaFromEval" title="Save current schema">
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/>
+                                        <polyline points="17 21 17 13 7 13 7 21"/>
+                                        <polyline points="7 3 7 8 15 8"/>
+                                    </svg>
+                                    Save as Schema
+                                </button>
+                            </div>
+                            <div class="schema-input-wrapper">
+                                <textarea 
+                                    id="schemaInput" 
+                                    class="schema-input" 
+                                    placeholder='{"field1": "", "field2": [], "nested": {"key": ""}}'
+                                    spellcheck="false"
+                                ></textarea>
+                                <div class="schema-actions">
+                                    <button class="schema-btn" id="formatSchema" title="Format JSON">
+                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <line x1="21" y1="10" x2="3" y2="10"/>
+                                            <line x1="21" y1="6" x2="3" y2="6"/>
+                                            <line x1="21" y1="14" x2="3" y2="14"/>
+                                            <line x1="21" y1="18" x2="3" y2="18"/>
+                                        </svg>
+                                    </button>
+                                    <button class="schema-btn" id="clearSchema" title="Clear">
+                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <line x1="18" y1="6" x2="6" y2="18"/>
+                                            <line x1="6" y1="6" x2="18" y2="18"/>
+                                        </svg>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="schema-status" id="schemaStatus"></div>
+                        </div>
+                    </div>
+
+                    <!-- Run Button -->
+                    <div class="run-section">
+                        <button class="run-btn" id="runBtn" disabled>
+                            <span class="btn-content">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <polygon points="5 3 19 12 5 21 5 3"/>
+                                </svg>
+                                Run Evaluation
+                            </span>
+                            <span class="btn-spinner" style="display: none;"></span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Results Section -->
+                <section class="results-section" id="resultsSection" style="display: none;">
+                    <div class="results-header">
+                        <h2>📊 Results Comparison</h2>
+                        <div class="results-actions">
+                            <button class="btn-secondary btn-icon" id="editPromptBtn" title="Edit prompt and create new version">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+                                    <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+                                </svg>
+                                Edit Prompt
+                            </button>
+                            <button class="btn-secondary btn-icon" id="addModelsBtn" title="Run additional models on same input">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <circle cx="12" cy="12" r="10"/>
+                                    <line x1="12" y1="8" x2="12" y2="16"/>
+                                    <line x1="8" y1="12" x2="16" y2="12"/>
+                                </svg>
+                                Add Models
+                            </button>
+                            <div class="results-divider"></div>
+                            <button class="btn-text" id="clearResults">Clear</button>
+                        </div>
+                    </div>
+                    <div class="results-grid" id="resultsGrid">
+                        <!-- Results cards populated by JavaScript -->
+                    </div>
+                    
+                    <!-- Judges Panel -->
+                    <div class="judges-panel" id="judgesPanel">
+                        <div class="judges-panel-header">
+                            <h3>
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"/>
+                                    <path d="M9 12l2 2 4-4"/>
+                                </svg>
+                                Apply Judges
+                            </h3>
+                            <span class="judges-hint">Click a judge to evaluate all model outputs</span>
+                        </div>
+                        <div class="judges-grid" id="judgesPanelGrid">
+                            <!-- Judge buttons populated by JavaScript -->
+                        </div>
+                    </div>
+                </section>
+                
+                <!-- Inline Prompt Edit Modal (for results page) -->
+                <div class="modal" id="inlinePromptModal" style="display: none;">
+                    <div class="modal-content modal-large">
+                        <div class="modal-header">
+                            <h3>Edit Prompt</h3>
+                            <button class="modal-close" onclick="closeModal('inlinePromptModal')">×</button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="form-group">
+                                <label>Choose an option:</label>
+                                <div class="form-group" style="margin-top: 10px;">
+                                    <label class="radio-label">
+                                        <input type="radio" name="promptEditMode" value="select" id="selectExistingPrompt" checked>
+                                        <span>Select from existing prompts</span>
+                                    </label>
+                                    <label class="radio-label">
+                                        <input type="radio" name="promptEditMode" value="edit" id="editInlinePrompt">
+                                        <span>Edit inline (create new version)</span>
+                                    </label>
+                                </div>
+                            </div>
+                            
+                            <!-- Select existing prompt -->
+                            <div class="form-group" id="selectPromptSection">
+                                <label for="inlinePromptSelect">Select Prompt</label>
+                                <select id="inlinePromptSelect" class="select-input">
+                                    <option value="">Loading prompts...</option>
+                                </select>
+                            </div>
+                            
+                            <!-- Edit inline -->
+                            <div class="form-group" id="editPromptSection" style="display: none;">
+                                <label for="inlinePromptName">Prompt Name</label>
+                                <input type="text" id="inlinePromptName" class="text-input" placeholder="e.g., ICSR Extraction v1">
+                            </div>
+                            <div class="form-group" id="editPromptContentSection" style="display: none;">
+                                <label for="inlinePromptContent">Prompt Content</label>
+                                <textarea id="inlinePromptContent" class="textarea-input" rows="15" placeholder="Enter your system prompt..."></textarea>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="checkbox-label">
+                                    <input type="checkbox" id="inlinePromptActive">
+                                    <span>Set as active/default version</span>
+                                </label>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button class="btn-secondary" onclick="closeModal('inlinePromptModal')">Cancel</button>
+                            <button class="btn-primary" id="saveInlinePromptBtn">Save</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- History View -->
+            <div class="view" id="historyView">
+                <header class="view-header">
+                    <h2>Run History</h2>
+                    <p class="subtitle">Review past evaluations and their results</p>
+                </header>
+                
+                <div class="history-table-container">
+                    <table class="history-table">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Prompt</th>
+                                <th>Document</th>
+                                <th>Models</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="historyTableBody">
+                            <tr class="empty-row">
+                                <td colspan="6">No runs yet. Start a new evaluation!</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                
+                <!-- Run Detail Modal -->
+                <div class="modal" id="runDetailModal" style="display: none;">
+                    <div class="modal-content modal-large">
+                        <div class="modal-header">
+                            <h3>Run Details</h3>
+                            <button class="modal-close" onclick="closeModal('runDetailModal')">×</button>
+                        </div>
+                        <div class="modal-body" id="runDetailContent">
+                            <!-- Populated dynamically -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Prompts View -->
+            <div class="view" id="promptsView">
+                <header class="view-header">
+                    <h2>Prompt Versions</h2>
+                    <p class="subtitle">Manage and version your system prompts</p>
+                    <button class="btn-primary" onclick="openPromptModal()">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="12" y1="5" x2="12" y2="19"/>
+                            <line x1="5" y1="12" x2="19" y2="12"/>
+                        </svg>
+                        New Prompt
                     </button>
+                </header>
+                
+                <div class="prompts-list" id="promptsList">
+                    <div class="empty-state">No prompts yet. Create your first prompt!</div>
                 </div>
-            </section>
+                
+                <!-- Prompt Modal -->
+                <div class="modal" id="promptModal" style="display: none;">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h3 id="promptModalTitle">New Prompt</h3>
+                            <button class="modal-close" onclick="closeModal('promptModal')">×</button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="form-group">
+                                <label for="promptName">Prompt Name</label>
+                                <input type="text" id="promptName" class="text-input" placeholder="e.g., ICSR Extraction v1">
+                            </div>
+                            <div class="form-group">
+                                <label for="promptContent">Prompt Content</label>
+                                <textarea id="promptContent" class="textarea-input" rows="15" placeholder="Enter your system prompt..."></textarea>
+                            </div>
+                            <div class="form-group">
+                                <label class="checkbox-label">
+                                    <input type="checkbox" id="promptActive">
+                                    <span>Set as active version</span>
+                                </label>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button class="btn-secondary" onclick="closeModal('promptModal')">Cancel</button>
+                            <button class="btn-primary" id="savePromptBtn">Save Prompt</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
-            <!-- Results Section -->
-            <section class="results-section" id="resultsSection" style="display: none;">
-                <div class="results-header">
-                    <h2>📊 Results Comparison</h2>
-                    <button class="clear-results-btn" id="clearResults">Clear Results</button>
+            <!-- Schemas View -->
+            <div class="view" id="schemasView">
+                <header class="view-header">
+                    <h2>JSON Schemas</h2>
+                    <p class="subtitle">Manage and version your target JSON schemas</p>
+                    <button class="btn-primary" onclick="openSchemaModal()">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="12" y1="5" x2="12" y2="19"/>
+                            <line x1="5" y1="12" x2="19" y2="12"/>
+                        </svg>
+                        New Schema
+                    </button>
+                </header>
+                
+                <div class="schemas-list" id="schemasList">
+                    <div class="empty-state">No schemas yet. Create your first schema!</div>
                 </div>
-                <div class="results-grid" id="resultsGrid">
-                    <!-- Results cards populated by JavaScript -->
+                
+                <!-- Schema Modal -->
+                <div class="modal" id="schemaModal" style="display: none;">
+                    <div class="modal-content modal-large">
+                        <div class="modal-header">
+                            <h3 id="schemaModalTitle">New Schema</h3>
+                            <button class="modal-close" onclick="closeModal('schemaModal')">×</button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="form-group">
+                                <label for="schemaName">Schema Name</label>
+                                <input type="text" id="schemaName" class="text-input" placeholder="e.g., ICSR Schema v1">
+                            </div>
+                            <div class="form-group">
+                                <label for="schemaContent">Schema Content (JSON)</label>
+                                <div class="code-editor-header">
+                                    <span class="hint">Paste JSON and click Format for consistent indentation</span>
+                                    <div class="code-editor-actions">
+                                        <button class="schema-btn" id="formatSchemaModal" type="button" title="Format JSON">Format</button>
+                                        <button class="schema-btn" id="clearSchemaModal" type="button" title="Clear">Clear</button>
+                                    </div>
+                                </div>
+                                <textarea id="schemaContent" class="code-input schema-code-input" rows="20" spellcheck="false" placeholder='{\"key\": \"value\"}'></textarea>
+                                <span id="schemaModalStatus" class="schema-status"></span>
+                            </div>
+                            <div class="form-group">
+                                <label class="checkbox-label">
+                                    <input type="checkbox" id="schemaActive">
+                                    <span>Set as active/default version</span>
+                                </label>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button class="btn-secondary" onclick="closeModal('schemaModal')">Cancel</button>
+                            <button class="btn-primary" id="saveSchemaBtn">Save Schema</button>
+                        </div>
+                    </div>
                 </div>
-            </section>
+            </div>
 
-            <!-- Error Message -->
-            <div class="error-toast" id="errorToast" style="display: none;">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <circle cx="12" cy="12" r="10"/>
-                    <line x1="15" y1="9" x2="9" y2="15"/>
-                    <line x1="9" y1="9" x2="15" y2="15"/>
-                </svg>
-                <span id="errorMessage"></span>
+            <!-- Judges View -->
+            <div class="view" id="judgesView">
+                <header class="view-header">
+                    <h2>Judge Templates</h2>
+                    <p class="subtitle">Create LLM-as-Judge evaluators for your outputs</p>
+                    <button class="btn-primary" onclick="openJudgeModal()">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="12" y1="5" x2="12" y2="19"/>
+                            <line x1="5" y1="12" x2="19" y2="12"/>
+                        </svg>
+                        New Judge
+                    </button>
+                </header>
+                
+                <div class="judges-list" id="judgesList">
+                    <div class="empty-state">No judges yet. Create your first judge template!</div>
+                </div>
+                
+                <!-- Judge Modal -->
+                <div class="modal" id="judgeModal" style="display: none;">
+                    <div class="modal-content modal-large">
+                        <div class="modal-header">
+                            <h3 id="judgeModalTitle">New Judge</h3>
+                            <button class="modal-close" onclick="closeModal('judgeModal')">×</button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="judgeName">Judge Name</label>
+                                    <input type="text" id="judgeName" class="text-input" placeholder="e.g., Schema Validator">
+                                </div>
+                                <div class="form-group">
+                                    <label for="judgeModel">Judge Model</label>
+                                    <select id="judgeModel" class="select-input">
+                                        <!-- Populated by JavaScript -->
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="judgeDescription">Description</label>
+                                <input type="text" id="judgeDescription" class="text-input" placeholder="What does this judge evaluate?">
+                            </div>
+                            <div class="form-group">
+                                <label for="judgePrompt">Judge Prompt</label>
+                                <p class="hint">Use variables: <code>{{model_output}}</code>, <code>{{schema}}</code>, <code>{{golden_set}}</code>, <code>{{original_prompt}}</code></p>
+                                <textarea id="judgePrompt" class="textarea-input" rows="10" placeholder="Enter your judge evaluation prompt..."></textarea>
+                            </div>
+                            <div class="form-group">
+                                <label for="goldenSet">Golden Set (Optional)</label>
+                                <p class="hint">Expected correct output for comparison</p>
+                                <textarea id="goldenSet" class="textarea-input code" rows="6" placeholder='{"expected": "output"}'></textarea>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button class="btn-secondary" onclick="closeModal('judgeModal')">Cancel</button>
+                            <button class="btn-primary" id="saveJudgeBtn">Save Judge</button>
+                        </div>
+                    </div>
+                </div>
             </div>
         </main>
+        </div>
+
+    <!-- Error Toast -->
+    <div class="error-toast" id="errorToast" style="display: none;">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"/>
+            <line x1="15" y1="9" x2="9" y2="15"/>
+            <line x1="9" y1="9" x2="15" y2="15"/>
+        </svg>
+        <span id="errorMessage"></span>
     </div>
 
-    <script src="script.js"></script>
+    <!-- Success Toast -->
+    <div class="success-toast" id="successToast" style="display: none;">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+            <polyline points="22 4 12 14.01 9 11.01"/>
+        </svg>
+        <span id="successMessage"></span>
+    </div>
+
+    <script src="script.js?v=2"></script>
 </body>
 </html>

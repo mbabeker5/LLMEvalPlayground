@@ -61,7 +61,7 @@ You are an expert document information extractor for ICH-ICSR (Individual Case S
 - `"3"` = Other
 - `"4"` = Not available to sender (unknown)
 
-### 4) C.5.4 Study Type Where Reaction(s) / Event(s) Were Observed (use these codes only)  
+### 6) C.5.4 Study Type Where Reaction(s) / Event(s) Were Observed (use these codes only)  
 *(use these codes only)*
 - `"1"` = Clinical trials
 - `"2"` = Individual patient use (e.g. ‘compassionate use’ or ‘named patient basis’)

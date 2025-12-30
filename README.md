@@ -126,8 +126,8 @@ Run evaluation across selected models.
     {
       "model_id": "gemini-3-flash-preview",
       "model_name": "Gemini 3 Flash (Preview)",
-      "success": true,
-      "json_data": { ... },
+  "success": true,
+  "json_data": { ... },
       "duration_ms": 2500
     },
     ...
